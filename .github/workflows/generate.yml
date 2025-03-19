@@ -11,17 +11,17 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-  
+
     steps:
-    
+
     - name: Выгрузка кода
       uses: actions/checkout@v2
-      
+
     - name: Настройка Go
       uses: actions/setup-go@v2
       with:
         go-version: '1.23.3'
-        
+
     - name: Установка компилятора Protobuf
       run: |
         PB_REL="https://github.com/protocolbuffers/protobuf/releases"
@@ -31,7 +31,7 @@ jobs:
         export PATH="$PATH:$HOME/.local/bin"
         echo 'export PATH="$PATH:$HOME/.local/bin"' >> ~/.bashrc
         source ~/.bashrc
-        
+
     - name: Установка protoc-gen-go
       run: go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 
@@ -39,36 +39,34 @@ jobs:
       run: go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 
     - name: Генерация Go-кода
-      run: protoc --go_out=go-proto-module --go-grpc_out=go-proto-module ./auth.proto
-     
-    - name: Проверка наличия сгенерированного файла
-      run: |
-        cd go-proto-module
-        ls -la
+      run: protoc --go_out=. --go-grpc_out=. auth.proto
+
+    - name: Проверка содержимого директории proto
+      run: ls -la proto
 
     - name: Checkout Go module repository
       uses: actions/checkout@v2
       with:
         repository: sandrinasava/go-proto-module
-        token: ${{ secrets.PROTO_TOKEN }} 
+        token: ${{ secrets.PROTO_TOKEN }}
         path: go-proto-module
 
-    - name: Проверка копирования файла в go-proto-module
+    - name: Copy generated files
       run: |
-        cd go-proto-module
-        ls -la
+        if [ -f proto/auth.pb.go ]; then
+          cp proto/auth.pb.go go-proto-module/
+        else
+          echo "File auth.pb.go not found in proto directory!"
+          exit 1
+        fi
 
     - name: Commit and push changes
       run: |
         cd go-proto-module
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-        git checkout -B update-protobuf-files  # Создаем или переключаемся на ветку
-        git fetch origin update-protobuf-files || true  # Получаем последние изменения из удаленной ветки
-        git reset --hard origin/update-protobuf-files || true  # Сбрасываем изменения к последнему коммиту ветки
-        git add auth.pb.go auth_grpc.pb.go
-        git status  # Проверяем статус
-        git commit -m "Update generated protobuf files" || true  # Делаем коммит, если есть изменения
+        git add auth.pb.go
+        git commit --allow-empty -m "Update generated protobuf files"
         git push origin update-protobuf-files
 
     - name: Create Pull Request
@@ -79,5 +77,4 @@ jobs:
         title: "Update generated protobuf files"
         body: "This PR updates the generated protobuf files."
         branch: "update-protobuf-files"
-        base: "master"
-        repository: sandrinasava/go-proto-module
+        base: "main"
