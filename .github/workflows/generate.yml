@@ -50,6 +50,29 @@ jobs:
         repository: sandrinasava/go-proto-module
         token: ${{ secrets.PROTO_TOKEN }}
         path: go-proto-module
+        ref: main  # Укажите правильное имя основной ветки
+
+    - name: Очистка неотслеживаемых файлов
+      run: |
+        cd go-proto-module
+        git clean -fd  # Удаляем неотслеживаемые файлы
+        git reset --hard  # Сбрасываем изменения
+
+    - name: Проверка и добавление файлов в репозиторий
+      run: |
+        cd go-proto-module
+        if [ ! -f auth.pb.go ] || [ ! -f auth_grpc.pb.go ]; then
+          echo "Файлы auth.pb.go и/или auth_grpc.pb.go не найдены. Создаем пустые файлы."
+          touch auth.pb.go auth_grpc.pb.go
+          git add auth.pb.go auth_grpc.pb.go
+          git commit -m "Add initial versions of auth.pb.go and auth_grpc.pb.go"
+          git push origin main  # Используйте правильное имя основной ветки
+        fi
+
+    - name: Проверка наличия файлов в go-proto-module
+      run: |
+        cd go-proto-module
+        ls -la
 
     - name: Copy generated files
       run: |
@@ -60,6 +83,18 @@ jobs:
           exit 1
         fi
 
+        if [ -f proto/auth_grpc.pb.go ]; then
+          cp proto/auth_grpc.pb.go go-proto-module/
+        else
+          echo "File auth_grpc.pb.go not found in proto directory!"
+          exit 1
+        fi
+
+    - name: Проверка наличия скопированных файлов в go-proto-module
+      run: |
+        cd go-proto-module
+        ls -la
+
     - name: Commit and push changes
       run: |
         cd go-proto-module
@@ -67,9 +102,11 @@ jobs:
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
         git fetch origin
         git checkout update-protobuf-files || git checkout -b update-protobuf-files
-        git pull --rebase origin update-protobuf-files
-        rm -f auth.pb.go
+        git pull --rebase origin update-protobuf-files || true  # Игнорируем ошибки при первом выполнении
+        rm -f auth.pb.go auth_grpc.pb.go
         cp ../proto/auth.pb.go .
-        git add auth.pb.go
-        git commit --allow-empty -m "Update generated protobuf files"
+        cp ../proto/auth_grpc.pb.go .
+        git add auth.pb.go auth_grpc.pb.go
+        git status  # Проверяем статус
+        git commit -m "Update generated protobuf files" || true  # Делаем коммит, если есть изменения
         git push origin update-protobuf-files
