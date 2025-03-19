@@ -41,6 +41,9 @@ jobs:
 
     - name: Генерация Go-кода
       run: protoc --go_out=. --go-grpc_out=. auth.proto
+     
+    - name: Проверка наличия сгенерированного файла
+      run: ls -la
 
     - name: Checkout Go module repository
       uses: actions/checkout@v2
@@ -51,7 +54,12 @@ jobs:
 
     - name: Copy generated files
       run: |
-        cp auth.pb.go go-proto-module/
+        if [ -f auth.pb.go ]; then
+          cp auth.pb.go go-proto-module/
+        else
+          echo "File auth.pb.go not found!"
+          exit 1
+        fi
 
     - name: Commit and push changes
       run: |
