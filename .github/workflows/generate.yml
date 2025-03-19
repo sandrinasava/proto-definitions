@@ -1,23 +1,18 @@
-# This is a basic workflow to help you get started with Actions
 
 name: Генерация артефактов из Protobuf
 
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "master" branch
   push:
     branches: [ "master" ]
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
+  build:
+
+    runs-on: ubuntu-latest
+  
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    
     - name: Выгрузка кода
       uses: actions/checkout@v2
       
@@ -43,10 +38,35 @@ jobs:
       run: go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 
     - name: Генерация Go-кода
-      run: protoc --go_out=. --go-grpc_out=. *.proto
+      run: protoc --go_out=. --go-grpc_out=. auth.proto
 
-    - name: Архивирование Go-артефактов
-      uses: actions/upload-artifact@v2
+    - name: Checkout Go module repository
+      uses: actions/checkout@v2
       with:
-        name: go-artifacts
-        path: ./*.pb.go
+        repository: sandrinasava/go-proto-module
+        token: ${{ secrets.PAT }}  # Personal Access Token с правами на запись
+        path: go-proto-module
+
+    - name: Copy generated files
+      run: |
+        cp auth.pb.go go-proto-module/
+
+    - name: Commit and push changes
+      run: |
+        cd go-proto-module
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        git add auth.pb.go
+        git commit -m "Update generated protobuf files"
+        git push origin update-protobuf-files
+
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v3
+      with:
+        token: ${{ secrets.PAT }}
+        commit-message: "Update generated protobuf files"
+        title: "Update generated protobuf files"
+        body: "This PR updates the generated protobuf files."
+        branch: "update-protobuf-files"
+        base: "main"
+        repository: sandrinasava/go-proto-module
