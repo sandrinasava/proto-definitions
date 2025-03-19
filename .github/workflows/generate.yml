@@ -72,7 +72,7 @@ jobs:
         rm -f auth.pb.go  # Удаляем существующий файл, если он есть
         cp ../proto/auth.pb.go .  # Копируем новый файл
         git add auth.pb.go
-        git commit -m "Update generated protobuf files"
+        git commit --allow-empty -m "Update generated protobuf files"
         git push origin update-protobuf-files
 
     - name: Create Pull Request
