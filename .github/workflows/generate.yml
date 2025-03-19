@@ -69,7 +69,7 @@ jobs:
         git checkout update-protobuf-files
         git add auth.pb.go
         git commit --allow-empty -m "Update generated protobuf files"
-        git push origin update-protobuf-files
+        git push 
 
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v3
