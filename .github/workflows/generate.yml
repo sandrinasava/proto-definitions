@@ -71,6 +71,7 @@ jobs:
         cp ../proto/auth.pb.go .
         git add auth.pb.go
         git commit --allow-empty -m "Update generated protobuf files"
+        git pull --rebase origin update-protobuf-files
         git push origin update-protobuf-files
 
     - name: Create Pull Request
