@@ -39,10 +39,12 @@ jobs:
       run: go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 
     - name: Генерация Go-кода
-      run: protoc --go_out=./proto --go-grpc_out=./proto ./auth.proto
+      run: protoc --go_out=go-proto-module --go-grpc_out=go-proto-module ./auth.proto
      
     - name: Проверка наличия сгенерированного файла
-      run: ls -la ./proto
+      run: |
+        cd go-proto-module
+        ls -la
 
     - name: Checkout Go module repository
       uses: actions/checkout@v2
@@ -51,14 +53,10 @@ jobs:
         token: ${{ secrets.PROTO_TOKEN }} 
         path: go-proto-module
 
-    - name: Copy generated files
+    - name: Проверка копирования файла в go-proto-module
       run: |
-        if [ -f ./proto/auth.pb.go ]; then
-          cp ./proto/auth.pb.go go-proto-module/
-        else
-          echo "File ./proto/auth.pb.go not found!"
-          exit 1
-        fi
+        cd go-proto-module
+        ls -la
 
     - name: Commit and push changes
       run: |
@@ -68,9 +66,7 @@ jobs:
         git checkout -B update-protobuf-files  # Создаем или переключаемся на ветку
         git fetch origin update-protobuf-files || true  # Получаем последние изменения из удаленной ветки
         git reset --hard origin/update-protobuf-files || true  # Сбрасываем изменения к последнему коммиту ветки
-        rm -f auth.pb.go  # Удаляем существующий файл, если он есть
-        cp ../proto/auth.pb.go .  # Копируем новый файл
-        git add auth.pb.go
+        git add auth.pb.go auth_grpc.pb.go
         git status  # Проверяем статус
         git commit -m "Update generated protobuf files" || true  # Делаем коммит, если есть изменения
         git push origin update-protobuf-files
