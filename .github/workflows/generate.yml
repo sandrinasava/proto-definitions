@@ -63,12 +63,14 @@ jobs:
 
     - name: Commit and push changes
       run: |
-        cd go-proto-module
-        git config --global user.name 'github-actions[bot]'
-        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-        git add auth.pb.go
-        git commit -m "Update generated protobuf files"
-        git push origin update-protobuf-files
+       cd go-proto-module
+       git config --global user.name 'github-actions[bot]'
+       git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+       git checkout -b update-protobuf-files || true  # Создаем ветку, если она не существует
+       git branch  # Проверяем, что ветка создана
+       git add auth.pb.go
+       git commit -m "Update generated protobuf files"
+       git push origin update-protobuf-files
 
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v3
