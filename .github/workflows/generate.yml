@@ -67,11 +67,11 @@ jobs:
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
         git fetch origin
         git checkout update-protobuf-files || git checkout -b update-protobuf-files
+        git pull --rebase origin update-protobuf-files
         rm -f auth.pb.go
         cp ../proto/auth.pb.go .
         git add auth.pb.go
         git commit --allow-empty -m "Update generated protobuf files"
-        git pull --rebase origin update-protobuf-files
         git push origin update-protobuf-files
 
     - name: Create Pull Request
@@ -82,4 +82,4 @@ jobs:
         title: "Update generated protobuf files"
         body: "This PR updates the generated protobuf files."
         branch: "update-protobuf-files"
-        base: "main"
+        base: "main"  # Используем main в качестве базовой ветки
