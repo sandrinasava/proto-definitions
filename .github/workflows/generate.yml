@@ -66,10 +66,12 @@ jobs:
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
         git fetch origin
-        git checkout update-protobuf-files
+        git checkout update-protobuf-files || git checkout -b update-protobuf-files
+        rm -f auth.pb.go
+        cp ../proto/auth.pb.go .
         git add auth.pb.go
         git commit --allow-empty -m "Update generated protobuf files"
-        git push 
+        git push origin update-protobuf-files
 
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v3
