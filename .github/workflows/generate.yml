@@ -80,5 +80,5 @@ jobs:
         title: "Update generated protobuf files"
         body: "This PR updates the generated protobuf files."
         branch: "update-protobuf-files"
-        base: "main"
+        base: "master"
         repository: sandrinasava/go-proto-module
