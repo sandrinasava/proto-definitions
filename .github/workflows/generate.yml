@@ -4,6 +4,8 @@ name: Генерация артефактов из Protobuf
 on:
   push:
     branches: [ "master" ]
+    paths:
+    - "auth.proto"
 
 jobs:
 
