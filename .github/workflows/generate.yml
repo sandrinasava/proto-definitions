@@ -65,6 +65,8 @@ jobs:
         cd go-proto-module
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        git fetch origin
+        git checkout update-protobuf-files
         git add auth.pb.go
         git commit --allow-empty -m "Update generated protobuf files"
         git push origin update-protobuf-files
