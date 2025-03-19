@@ -40,7 +40,7 @@ jobs:
       run: go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 
     - name: Генерация Go-кода
-      run: protoc --go_out=. --go-grpc_out=. auth.proto
+      run: protoc --go_out=./proto --go-grpc_out=./proto ./auth.proto
      
     - name: Проверка наличия сгенерированного файла
       run: ls -la
@@ -54,12 +54,12 @@ jobs:
 
     - name: Copy generated files
       run: |
-        if [ -f auth.pb.go ]; then
-          cp auth.pb.go go-proto-module/
-        else
-          echo "File auth.pb.go not found!"
-          exit 1
-        fi
+       if [ -f proto/auth.pb.go ]; then
+       cp proto/auth.pb.go go-proto-module/
+       else
+       echo "File proto/auth.pb.go not found!"
+       exit 1
+       fi
 
     - name: Commit and push changes
       run: |
