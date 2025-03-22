@@ -39,7 +39,9 @@ jobs:
       run: go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 
     - name: Генерация Go-кода
-      run: protoc --go_out=. --go-grpc_out=. auth.proto
+      run: |
+       mkdir -p proto
+       protoc --go_out=. --go-grpc_out=. auth.proto
 
     - name: Проверка содержимого директории proto
       run: ls -la proto
@@ -50,7 +52,7 @@ jobs:
         repository: sandrinasava/go-proto-module
         token: ${{ secrets.PROTO_TOKEN }}
         path: go-proto-module
-        ref: main  # Укажите правильное имя основной ветки
+        ref: main 
 
     - name: Очистка неотслеживаемых файлов
       run: |
