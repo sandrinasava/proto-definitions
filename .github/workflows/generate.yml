@@ -22,6 +22,13 @@ jobs:
       with:
         go-version: '1.23.3'
 
+    - name: Создание go.mod (если отсутствует)
+      run: |
+        if [ ! -f go.mod ]; then
+          go mod init github.com/sandrinasava/proto-definitions
+          echo "go 1.23.3" >> go.mod
+        fi   
+
     - name: Установка компилятора Protobuf
       run: |
         PB_REL="https://github.com/protocolbuffers/protobuf/releases"
