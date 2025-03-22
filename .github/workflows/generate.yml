@@ -23,7 +23,7 @@ jobs:
         go-version: '1.23.3'
     
     - name: Проверка версии Go
-       run: go version    
+      run: go version    
 
     - name: Установка компилятора Protobuf
       run: |
