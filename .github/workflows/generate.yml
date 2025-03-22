@@ -21,6 +21,9 @@ jobs:
       uses: actions/setup-go@v2
       with:
         go-version: '1.23.3'
+    
+    - name: Проверка версии Go
+       run: go version    
 
     - name: Установка компилятора Protobuf
       run: |
@@ -31,14 +34,6 @@ jobs:
         export PATH="$PATH:$HOME/.local/bin"
         echo 'export PATH="$PATH:$HOME/.local/bin"' >> ~/.bashrc
         source ~/.bashrc
-
-    - name: Проверка версии protoc
-      run: protoc --version
-
-    - name: Удаление кэшированных версий protoc-gen-go и protoc-gen-go-grpc
-      run: |
-        go clean -i google.golang.org/protobuf/cmd/protoc-gen-go
-        go clean -i google.golang.org/grpc/cmd/protoc-gen-go-grpc
 
     - name: Установка protoc-gen-go
       run: go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
