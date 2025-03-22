@@ -32,12 +32,26 @@ jobs:
         echo 'export PATH="$PATH:$HOME/.local/bin"' >> ~/.bashrc
         source ~/.bashrc
 
+    - name: Проверка версии protoc
+      run: protoc --version
+
+    - name: Удаление кэшированных версий protoc-gen-go и protoc-gen-go-grpc
+      run: |
+        go clean -i google.golang.org/protobuf/cmd/protoc-gen-go
+        go clean -i google.golang.org/grpc/cmd/protoc-gen-go-grpc
+
     - name: Установка protoc-gen-go
       run: go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 
     - name: Установка protoc-gen-go-grpc
       run: go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 
+    - name: Проверка версии protoc-gen-go
+      run: protoc-gen-go --version
+
+    - name: Проверка версии protoc-gen-go-grpc
+      run: protoc-gen-go-grpc --version
+      
     - name: Генерация Go-кода
       run: |
        mkdir -p proto
